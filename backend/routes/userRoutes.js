@@ -15,7 +15,6 @@ const router = express.Router();
 ========================= */
 router.post("/register", registerUser);
 router.post("/login", login);
-router.get("/:id/logout", logout);
 
 /* =========================
    User management
