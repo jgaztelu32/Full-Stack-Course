@@ -33,27 +33,4 @@ const userSchema = new mongoose.Schema(
 ========================= */
 const User = mongoose.model("User", userSchema);
 
-/* =========================
-   Create user
-========================= */
-
-
-/* =========================
-   Modify name
-========================= */
-
-
-/* =========================
-   Modify password
-========================= */
-
-
-/* =========================
-   Delete user
-========================= */
-
-/* =========================
-   Login
-========================= */
-
 module.exports = mongoose.model("User", userSchema);
