@@ -3,6 +3,8 @@ const dotenv = require('dotenv').config();
 const connectDB = require('./controllers/config/db');
 const port = process.env.PORT || 8000;
 const userRoutes = require("./routes/userRoutes");
+const folderRoutes = require("./routes/folderRoutes");
+const fileRoutes = require("./routes/fileRoutes");
 
 const app = express();
 
@@ -17,6 +19,9 @@ app.use(express.json());
    Routes
 ========================= */
 app.use("/api/users", userRoutes);
+app.use("/api/folders", folderRoutes);
+app.use("/api/files", fileRoutes);
+
 
 /* =========================
    Server
