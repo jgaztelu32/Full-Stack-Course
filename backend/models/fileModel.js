@@ -45,10 +45,17 @@ const fileSchema = new mongoose.Schema(
 /* =========================
    Indexes
 ========================= */
-// Evitar archivos duplicados con mismo nombre en la misma carpeta
+// Avoid duplicates in the same folder
 fileSchema.index(
   { parent: 1, name: 1 },
   { unique: true }
 );
+
+// Partial search by name and description
+fileSchema.index({
+  name: "text",
+  description: "text",
+});
+
 
 module.exports = mongoose.model("File", fileSchema);

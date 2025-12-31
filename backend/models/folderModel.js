@@ -42,7 +42,7 @@ const folderSchema = new mongoose.Schema(
 /* =========================
    Indexes
 ========================= */
-// Evitar duplicados por usuario y nivel
+// Avoid duplicates in the same folder
 folderSchema.index(
   { parent: 1, name: 1 },
   { unique: true }

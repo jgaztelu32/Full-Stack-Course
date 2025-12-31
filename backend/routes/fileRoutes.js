@@ -6,7 +6,10 @@ const {
   getFile,
   updateFile,
   deleteFile,
+  getFilesByFolder,
+  searchFiles,
 } = require("../controllers/fileController");
+
 
 const router = express.Router();
 const upload = multer();
@@ -16,25 +19,25 @@ const upload = multer();
 ========================= */
 
 /**
- * Subir archivo (multipart)
+ * Upload file (multipart)
  * metadata: JSON (name, description, parent)
- * file: archivo binario
+ * file: binary file
  */
 router.post("/", upload.single("file"), createFile);
 
-/**
- * Obtener archivo
- */
+// Get files by folder
+router.get("/folder/:folderId", getFilesByFolder);
+
+// Search files by name/description
+router.get("/search", searchFiles);
+
+// Get file content
 router.get("/:id", getFile);
 
-/**
- * Actualizar metadata
- */
+// Update file (multipart)
 router.put("/:id", upload.single("file"), updateFile);
 
-/**
- * Eliminar archivo
- */
+// Delete file
 router.delete("/:id", deleteFile);
 
 module.exports = router;

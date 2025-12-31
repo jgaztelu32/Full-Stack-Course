@@ -117,9 +117,64 @@ const deleteFile = async (req, res) => {
   }
 };
 
+/* =========================
+   Get files by folder
+========================= */
+const getFilesByFolder = async (req, res) => {
+  try {
+    const { folderId } = req.params;
+
+    const files = await File.find(
+      { parent: folderId },
+      {
+        data: 0, // Exclude file data
+      }
+    );
+
+    res.json(files);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/* =========================
+   Search files by name/description
+========================= */
+const searchFiles = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({
+        message: "El parámetro query es obligatorio",
+      });
+    }
+
+    const regex = new RegExp(query, "i");
+
+    const files = await File.find(
+      {
+        $or: [
+          { name: regex },
+          { description: regex },
+        ],
+      },
+      {
+        data: 0, // Exclude file data
+      }
+    );
+
+    res.json(files);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createFile,
   getFile,
   updateFile,
   deleteFile,
+  getFilesByFolder,
+  searchFiles,
 };
