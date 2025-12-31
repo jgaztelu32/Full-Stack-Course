@@ -65,7 +65,7 @@ const updateFile = async (req, res) => {
   try {
     const updates = {};
 
-    // Metadata opcional
+    // Metadata optional
     if (req.body.metadata) {
       const metadata = JSON.parse(req.body.metadata);
 
@@ -74,7 +74,7 @@ const updateFile = async (req, res) => {
       if (metadata.parent) updates.parent = metadata.parent;
     }
 
-    // Archivo opcional
+    // File is optional
     if (req.file) {
       updates.data = req.file.buffer;
       updates.size = req.file.size;
