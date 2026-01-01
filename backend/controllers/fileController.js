@@ -9,7 +9,7 @@ const createFile = async (req, res) => {
     const { name, description, parent } = JSON.parse(req.body.metadata);
 
     if (!req.file) {
-      return res.status(400).json({ message: "Archivo no enviado" });
+      return res.status(400).json({ message: "File not uploaded" });
     }
 
     if (!(await permission.canWrite(req.user.id, "folder", parent))) {
@@ -34,7 +34,7 @@ const createFile = async (req, res) => {
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).json({
-        message: "Ya existe un archivo con ese nombre en la carpeta",
+        message: "File with that name already exists in the specified parent folder",
       });
     }
 
@@ -50,7 +50,13 @@ const getFile = async (req, res) => {
     const file = await File.findById(req.params.id);
 
     if (!file) {
-      return res.status(404).json({ message: "Archivo no encontrado" });
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    if (!(await permission.canRead(req.user.id, "folder", file.parent))) {
+        return res.status(403).json({
+            message: "You don't have permission to read this file",
+        });
     }
 
     res.set("Content-Type", "application/octet-stream");
@@ -87,15 +93,23 @@ const updateFile = async (req, res) => {
       updates.size = req.file.size;
     }
 
+    const old_file = await File.findById(req.params.id);
+
+    if (!old_file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    if (!(await permission.canWrite(req.user.id, "folder", old_file.parent))) {
+        return res.status(403).json({
+            message: "You don't have permission to create files here",
+        });
+    }
+
     const file = await File.findByIdAndUpdate(
       req.params.id,
       updates,
       { new: true }
     );
-
-    if (!file) {
-      return res.status(404).json({ message: "Archivo no encontrado" });
-    }
 
     res.json({
       id: file._id,
@@ -111,70 +125,90 @@ const updateFile = async (req, res) => {
    Delete file
 ========================= */
 const deleteFile = async (req, res) => {
-  try {
-    const file = await File.findByIdAndDelete(req.params.id);
+    const old_file = await File.findById(req.params.id);
 
-    if (!file) {
-      return res.status(404).json({ message: "Archivo no encontrado" });
+    if (!old_file) {
+        return res.status(404).json({ message: "File not found" });
     }
 
-    res.json({ message: "Archivo eliminado" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    if (!(await permission.canWrite(req.user.id, "file", req.params.id))) {
+        return res.status(403).json({
+            message: "You don't have permission to delete this file",
+        });
+    }
+
+    try {
+        const file = await File.findByIdAndDelete(req.params.id);
+
+        res.json({ message: "File deleted" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 /* =========================
    Get files by folder
 ========================= */
 const getFilesByFolder = async (req, res) => {
-  try {
-    const { folderId } = req.params;
+    try {
+        const { folderId } = req.params;
 
-    const files = await File.find(
-      { parent: folderId },
-      {
-        data: 0, // Exclude file data
-      }
-    );
+        const all_files = await File.find(
+        { parent: folderId },
+        {
+            data: 0, // Exclude file data
+        }
+        );
 
-    res.json(files);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+        // Filter files by read permission
+        const userId = req.user.id;
+        const files = all_files.filter(file => {
+            return permission.canRead(userId, "file", file._id);
+        });
+        
+        res.json(files);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
 /* =========================
    Search files by name/description
 ========================= */
 const searchFiles = async (req, res) => {
-  try {
-    const { query } = req.query;
+    try {
+        const { query } = req.query;
 
-    if (!query) {
-      return res.status(400).json({
-        message: "El parámetro query es obligatorio",
-      });
+        if (!query) {
+        return res.status(400).json({
+            message: "Query parameter is required",
+        });
+        }
+
+        const regex = new RegExp(query, "i");
+
+        const all_files = await File.find(
+        {
+            $or: [
+            { name: regex },
+            { description: regex },
+            ],
+        },
+        {
+            data: 0, // Exclude file data
+        }
+        );
+
+        // Filter files by read permission
+        const userId = req.user.id;
+        const files = all_files.filter(file => {
+            return permission.canRead(userId, "file", file._id);
+        });
+            
+        res.json(files);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-
-    const regex = new RegExp(query, "i");
-
-    const files = await File.find(
-      {
-        $or: [
-          { name: regex },
-          { description: regex },
-        ],
-      },
-      {
-        data: 0, // Exclude file data
-      }
-    );
-
-    res.json(files);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
 };
 
 module.exports = {
