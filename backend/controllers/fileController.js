@@ -53,7 +53,7 @@ const getFile = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    if (!(await permission.canRead(req.user.id, "folder", file.parent))) {
+    if (!(await permission.canRead(req.user.id, "file", file._id))) {
         return res.status(403).json({
             message: "You don't have permission to read this file",
         });
@@ -75,50 +75,56 @@ const getFile = async (req, res) => {
    Update file
 ========================= */
 const updateFile = async (req, res) => {
-  try {
-    const updates = {};
+    try {
+        const updates = {};
 
-    // Metadata optional
-    if (req.body.metadata) {
-      const metadata = JSON.parse(req.body.metadata);
+        // Metadata optional
+        if (req.body.metadata) {
+        const metadata = JSON.parse(req.body.metadata);
 
-      if (metadata.name) updates.name = metadata.name;
-      if (metadata.description) updates.description = metadata.description;
-      if (metadata.parent) updates.parent = metadata.parent;
-    }
+        if (metadata.name) updates.name = metadata.name;
+        if (metadata.description) updates.description = metadata.description;
+        if (metadata.parent) updates.parent = metadata.parent;
+        }
 
-    // File is optional
-    if (req.file) {
-      updates.data = req.file.buffer;
-      updates.size = req.file.size;
-    }
+        // File is optional
+        if (req.file) {
+        updates.data = req.file.buffer;
+        updates.size = req.file.size;
+        }
 
-    const old_file = await File.findById(req.params.id);
+        const old_file = await File.findById(req.params.id);
 
-    if (!old_file) {
-      return res.status(404).json({ message: "File not found" });
-    }
+        if (!old_file) {
+        return res.status(404).json({ message: "File not found" });
+        }
 
-    if (!(await permission.canWrite(req.user.id, "folder", old_file.parent))) {
-        return res.status(403).json({
-            message: "You don't have permission to create files here",
+        if (!(await permission.canWrite(req.user.id, "file", old_file._id))) {
+            return res.status(403).json({
+                message: "You don't have permission to modify this file.",
+            });
+        }
+
+        const file = await File.findByIdAndUpdate(
+        req.params.id,
+        updates,
+        { new: true, runValidators: true }
+        );
+
+        res.json({
+        id: file._id,
+        name: file.name,
+        size: file.size,
         });
+    } catch (error) {
+        // Duplicate key error (same name in same folder)
+        if (error.code === 11000) {
+            return res.status(400).json({
+                message: "File with that name already exists in the target folder",
+            });
+        }
+        res.status(500).json({ message: error.message });
     }
-
-    const file = await File.findByIdAndUpdate(
-      req.params.id,
-      updates,
-      { new: true }
-    );
-
-    res.json({
-      id: file._id,
-      name: file.name,
-      size: file.size,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
 };
 
 /* =========================
@@ -161,10 +167,13 @@ const getFilesByFolder = async (req, res) => {
         );
 
         // Filter files by read permission
+        const files = [];
         const userId = req.user.id;
-        const files = all_files.filter(file => {
-            return permission.canRead(userId, "file", file._id);
-        });
+        for (const file of all_files) {
+            if (await permission.canRead(userId, "file", file._id)) {
+                files.push(file);
+            }
+        }
         
         res.json(files);
     } catch (error) {
@@ -200,11 +209,14 @@ const searchFiles = async (req, res) => {
         );
 
         // Filter files by read permission
+        const files = [];
         const userId = req.user.id;
-        const files = all_files.filter(file => {
-            return permission.canRead(userId, "file", file._id);
-        });
-            
+        for (const file of all_files) {
+            if (await permission.canRead(userId, "file", file._id)) {
+                files.push(file);
+            }
+        }
+                    
         res.json(files);
     } catch (error) {
         res.status(500).json({ message: error.message });

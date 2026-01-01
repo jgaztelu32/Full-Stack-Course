@@ -5,6 +5,7 @@ const port = process.env.PORT || 8000;
 const userRoutes = require("./routes/userRoutes");
 const folderRoutes = require("./routes/folderRoutes");
 const fileRoutes = require("./routes/fileRoutes");
+const permissionRoutes = require("./routes/permissionRoutes");
 const { protect } = require("./middleware/authMiddleware");
 
 const app = express();
@@ -22,7 +23,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/folders", folderRoutes);
 app.use("/api/files", fileRoutes);
-
+app.use("/api/permissions", permissionRoutes);
 
 /* =========================
    Server

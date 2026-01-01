@@ -22,7 +22,7 @@ const permissionSchema = new mongoose.Schema(
     },
 
     // ID of the protected resource
-    resource: {
+    resourceId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       refPath: "resourceType",
