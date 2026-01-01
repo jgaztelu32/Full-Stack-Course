@@ -5,6 +5,7 @@ const port = process.env.PORT || 8000;
 const userRoutes = require("./routes/userRoutes");
 const folderRoutes = require("./routes/folderRoutes");
 const fileRoutes = require("./routes/fileRoutes");
+const { protect } = require("./middleware/authMiddleware");
 
 const app = express();
 

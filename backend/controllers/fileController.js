@@ -1,4 +1,5 @@
 const File = require("../models/fileModel");
+const permission = require("../services/permissionService");
 
 /* =========================
    Create file (multipart)
@@ -9,6 +10,12 @@ const createFile = async (req, res) => {
 
     if (!req.file) {
       return res.status(400).json({ message: "Archivo no enviado" });
+    }
+
+    if (!(await permission.canWrite(req.user.id, "folder", parent))) {
+        return res.status(403).json({
+            message: "You don't have permission to create files here",
+        });
     }
 
     const file = await File.create({

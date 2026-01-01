@@ -9,6 +9,7 @@ const {
   getFilesByFolder,
   searchFiles,
 } = require("../controllers/fileController");
+const { protect } = require("../middleware/authMiddleware");
 
 
 const router = express.Router();
@@ -23,21 +24,21 @@ const upload = multer();
  * metadata: JSON (name, description, parent)
  * file: binary file
  */
-router.post("/", upload.single("file"), createFile);
+router.post("/", protect, upload.single("file"), createFile);
 
 // Get files by folder
-router.get("/folder/:folderId", getFilesByFolder);
+router.get("/folder/:folderId", protect, getFilesByFolder);
 
 // Search files by name/description
-router.get("/search", searchFiles);
+router.get("/search", protect, searchFiles);
 
 // Get file content
-router.get("/:id", getFile);
+router.get("/:id", protect, getFile);
 
 // Update file (multipart)
-router.put("/:id", upload.single("file"), updateFile);
+router.put("/:id", protect, upload.single("file"), updateFile);
 
 // Delete file
-router.delete("/:id", deleteFile);
+router.delete("/:id", protect, deleteFile);
 
 module.exports = router;

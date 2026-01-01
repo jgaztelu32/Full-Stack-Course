@@ -1,4 +1,5 @@
 const Folder = require("../models/folderModel");
+const permission = require("../services/permissionService");
 
 /* =========================
    Create folder
@@ -9,6 +10,12 @@ const createFolder = async (req, res) => {
 
     if (!userId) {
       return res.status(400).json({ message: "userId es obligatorio" });
+    }
+
+    if (!(await permission.canWrite(userId, "folder", parent))) {
+        return res.status(403).json({
+            message: "You don't have permission to create folders here",
+        });
     }
 
     const folder = await Folder.create({
@@ -22,7 +29,7 @@ const createFolder = async (req, res) => {
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).json({
-        message: "Ya existe una carpeta con ese nombre en este nivel",
+        message: "Folder with that name already exists in the specified parent folder",
       });
     }
 
@@ -36,18 +43,22 @@ const createFolder = async (req, res) => {
 const getFoldersByParent = async (req, res) => {
   try {
     const { parentId } = req.params;
-    const { userId } = req.query; /* We'll use it when implementing user-specific folder access */
+    const userId = req.user.id;
 
     const query = parentId === "root"
       ? { parent: null }
       : { parent: parentId };
 
-    const folders = await Folder.find(query).sort({ name: 1 });
+    const all_folders = await Folder.find(query).sort({ name: 1 });
+
+    const folders = all_folders.filter(folder => {
+      return permission.canRead(userId, "folder", folder._id);
+    });
 
     res.status(200).json(folders);
   } catch (error) {
     res.status(500).json({
-      message: "Error obteniendo carpetas",
+      message: "Error getting folders. Internal error.",
       error: error.message,
     });
   }
@@ -57,37 +68,43 @@ const getFoldersByParent = async (req, res) => {
    Delete folder (recursive)
 ========================= */
 const deleteFolderRecursive = async (folderId) => {
-  const children = await Folder.find({ parent: folderId });
+    const children = await Folder.find({ parent: folderId });
 
-  for (const child of children) {
-    await deleteFolderRecursive(child._id);
-  }
+    for (const child of children) {
+        await deleteFolderRecursive(child._id);
+    }
 
-  await Folder.findByIdAndDelete(folderId);
+    await Folder.findByIdAndDelete(folderId);
 };
 
 const deleteFolder = async (req, res) => {
-  try {
-    const { id } = req.params;
+    try {
+        const { id } = req.params;
 
-    const folder = await Folder.findById(id);
-    if (!folder) {
-      return res.status(404).json({
-        message: "La carpeta no existe",
-      });
+        const folder = await Folder.findById(id);
+        if (!folder) {
+            return res.status(404).json({
+                message: "Folder not found",
+            });
+        }
+
+        if (!(await permission.canWrite(req.user.id, "folder", id))) {
+            return res.status(403).json({
+                message: "You don't have permission to delete this folder",
+            });
+        }
+
+        await deleteFolderRecursive(id);
+
+        res.status(200).json({
+            message: "Folder deleted successfully.",
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error deleting folder. Internal error.",
+            error: error.message,
+        });
     }
-
-    await deleteFolderRecursive(id);
-
-    res.status(200).json({
-      message: "Carpeta eliminada correctamente",
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Error eliminando la carpeta",
-      error: error.message,
-    });
-  }
 };
 
 module.exports = {

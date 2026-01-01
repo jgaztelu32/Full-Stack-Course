@@ -4,14 +4,15 @@ const {
   getFoldersByParent,
   deleteFolder,
 } = require("../controllers/folderController");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 /* =========================
    Folder routes (protected)
 ========================= */
-router.post("/", createFolder);
-router.get("/:parentId", getFoldersByParent);
-router.delete("/:id", deleteFolder);
+router.post("/", protect, createFolder);
+router.get("/:parentId", protect, getFoldersByParent);
+router.delete("/:id", protect, deleteFolder);
 
 module.exports = router;

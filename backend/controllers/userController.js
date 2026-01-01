@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 /* =========================
    New user registration
@@ -25,11 +26,13 @@ const registerUser = async (req, res) => {
         password: hashed,
     });
 
-    userId = user._id;
+    const userId = user._id;
+    const token = generateToken(userId);
 
     res.status(201).json({
       message: "Usuario creado correctamente",
       userId,
+      token,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -53,11 +56,14 @@ const login = async (req, res) => {
     throw new Error("Credenciales inválidas");
     }
     
+    const token = generateToken(user._id);
+    
     res.status(200).json({
       message: "Success",
       id: user._id,
       name: user.name,
       email: user.email,
+      token: token,
     });
   } catch (error) {
     res.status(401).json({ message: error.message });
@@ -106,6 +112,19 @@ const removeUser = async (req, res) => {
   await User.findByIdAndDelete(id);
 
   res.status(200).json({ message: "Usuario eliminado correctamente" });
+};
+
+/* =========================
+   Generate JWT
+========================= */
+const generateToken = (userId) => {
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    }
+  );
 };
 
 module.exports = {

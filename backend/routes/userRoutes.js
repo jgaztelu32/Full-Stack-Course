@@ -7,6 +7,7 @@ const {
   changeUserPassword,
   removeUser,
 } = require("../controllers/userController");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -19,8 +20,8 @@ router.post("/login", login);
 /* =========================
    User management
 ========================= */
-router.put("/:id/name", changeUserName);
-router.put("/:id/password", changeUserPassword);
-router.delete("/:id", removeUser);
+router.put("/:id/name", protect, changeUserName);
+router.put("/:id/password", protect, changeUserPassword);
+router.delete("/:id", protect, removeUser);
 
 module.exports = router;
