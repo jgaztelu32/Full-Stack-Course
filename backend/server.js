@@ -7,10 +7,13 @@ const folderRoutes = require("./routes/folderRoutes");
 const fileRoutes = require("./routes/fileRoutes");
 const permissionRoutes = require("./routes/permissionRoutes");
 const { protect } = require("./middleware/authMiddleware");
+const cors = require("cors");
 
 const app = express();
 
 connectDB();
+
+app.use(cors());
 
 /* =========================
    Middlewares
