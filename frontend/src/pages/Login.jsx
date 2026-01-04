@@ -33,13 +33,14 @@ function Login() {
 
       console.log("Login success:", data);
       // TODO: redirect to dashboard
+      window.location = "/";
 
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+};
 
   return (
     <div style={styles.container}>
@@ -71,6 +72,9 @@ function Login() {
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
+        <div style={{ marginTop: "1rem", textAlign: "center" }}>
+            <a href="/register">Don't have an account? Register</a>
+        </div>
       </form>
     </div>
   );
