@@ -71,6 +71,21 @@ const login = async (req, res) => {
 };
 
 /* =========================
+   Get user info
+========================= */
+const whoami = async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return res.status(404).json({ message: "Usuario no encontrado" });
+  }
+  res.status(200).json({
+    id: user._id,
+    name: user.name,
+    email: user.email,
+  });
+};
+
+/* =========================
    Modify name
 ========================= */
 const changeUserName = async (req, res) => {
@@ -130,6 +145,7 @@ const generateToken = (userId) => {
 module.exports = {
   registerUser,
   login,
+  whoami,
   changeUserName,
   changeUserPassword,
   removeUser,

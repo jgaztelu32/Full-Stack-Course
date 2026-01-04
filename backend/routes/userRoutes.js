@@ -2,10 +2,10 @@ const express = require("express");
 const {
   registerUser,
   login,
-  logout,
   changeUserName,
   changeUserPassword,
   removeUser,
+  whoami
 } = require("../controllers/userController");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -16,6 +16,7 @@ const router = express.Router();
 ========================= */
 router.post("/register", registerUser);
 router.post("/login", login);
+router.post("/whoami", protect, whoami);
 
 /* =========================
    User management
