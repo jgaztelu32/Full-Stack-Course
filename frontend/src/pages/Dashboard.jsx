@@ -2,20 +2,21 @@ import { useEffect, useState } from "react";
 import Header from "../components/Header";
 
 function Dashboard() {
-    const token = localStorage.getItem("token");
-    const folder = localStorage.getItem("folder") || "root";
-    const urlFolders = "http://localhost:8000/api/folders/" + folder;
-    const urlCurrent = "http://localhost:8000/api/folders/current/" + folder;
-    const urlFiles = "http://localhost:8000/api/files/folder/" + folder;
     const [folders, setFolders] = useState(null);
     const [current, setCurrent] = useState(null);
     const [files, setFiles] = useState(null);
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
+        const folder = localStorage.getItem("folder") || "root";
         if (!token) {
             window.location.href = "/login";
             return;
         }
+
+        const urlFolders = "http://localhost:8000/api/folders/" + folder;
+        const urlCurrent = "http://localhost:8000/api/folders/current/" + folder;
+        const urlFiles = "http://localhost:8000/api/files/folder/" + folder;
 
         const getFolders = async () => {
             try {
@@ -98,7 +99,7 @@ function Dashboard() {
             getCurrent();
             getFiles();
         }
-    }, [token]);
+    }, []);
 
     const handleFolderClick = (folderId) => {
         localStorage.setItem("folder", folderId);
