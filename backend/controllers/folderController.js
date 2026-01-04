@@ -65,6 +65,35 @@ const getFoldersByParent = async (req, res) => {
 };
 
 /* =========================
+   Get current folder data
+========================= */
+const getCurrentFolderData = async (req, res) => {
+  try {
+    const { folderId } = req.params;
+    const userId = req.user.id;
+
+    if (folderId === "root") {
+      return res.status(200).json({ message: "Root folder", id: "root" });
+    }
+
+    const query = { _id: folderId };
+
+    const folders = await Folder.find(query).sort({ name: 1 });
+
+    if (folders.length === 0) {
+      return res.status(404).json({ message: "Folder not found or no access" });
+    }
+
+    res.status(200).json(folders[0]);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error getting folders. Internal error.",
+      error: error.message,
+    });
+  }
+};
+
+/* =========================
    Delete folder (recursive)
 ========================= */
 const deleteFolderRecursive = async (folderId) => {
@@ -110,5 +139,6 @@ const deleteFolder = async (req, res) => {
 module.exports = {
   createFolder,
   getFoldersByParent,
+  getCurrentFolderData,
   deleteFolder,
 };
