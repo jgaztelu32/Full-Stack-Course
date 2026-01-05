@@ -174,7 +174,7 @@ const getFilesByFolder = async (req, res) => {
                 files.push(file);
             }
         }
-        
+
         res.json(files);
     } catch (error) {
         res.status(500).json({ message: error.message });

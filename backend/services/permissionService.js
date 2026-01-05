@@ -30,8 +30,9 @@ const checkExplicitPermission = async (
 const getParentResource = async (resourceType, resourceId) => {
   if (resourceType === "file") {
     const file = await File.findById(resourceId).select("parent");
-    if (!file) return null;
-    return { type: "folder", id: file.parent };
+    const folder = await Folder.findById(file.parent).select("parent");
+    if (!folder) return null;
+    return { type: "folder", id: folder.parent };
   }
 
   if (resourceType === "folder") {
