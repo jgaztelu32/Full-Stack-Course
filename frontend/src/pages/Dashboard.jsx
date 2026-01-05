@@ -50,7 +50,9 @@ function Dashboard() {
             <div className="current-folder">Current folder: {current?.name || "Root"}</div>
             <div className="current-actions">
                 <button><FaFolder /> New folder</button>
-                <button onClick={() => setShowUpload(true)}><FaUpload /> Upload file</button>
+                {current && (
+                    <button onClick={() => setShowUpload(true)}><FaUpload /> Upload file</button>
+                )}
             </div>
         </div>
         {showUpload && (
