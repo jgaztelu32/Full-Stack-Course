@@ -11,3 +11,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.content-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.content-table th, .content-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.context-menu {
+  cursor: pointer;
+}
+
+.context-menu:hover {
+  color: #007BFF;
+}

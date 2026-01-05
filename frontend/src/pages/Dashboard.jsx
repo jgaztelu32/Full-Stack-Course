@@ -22,7 +22,7 @@ function Dashboard() {
             <div className="content" style={{ padding: "20px" }}>
                 <p>Current folder: {current?.name || "Root"}</p>
 
-                <table>
+                <table className="content-table">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -58,8 +58,9 @@ function Dashboard() {
                                     </span>
                                 </td>
                                 <td>-</td>
-                                <td><span
-                                    onClick={() => folderActions(folder._id)}><FaEllipsisH style={{ cursor: "pointer" }} /></span></td>
+                                <td><span className="context-menu"
+                                    onClick={() => folderActions(folder._id)}>
+                                    <FaEllipsisH style={{ cursor: "pointer" }} /></span></td>
                             </tr>
                         ))}
 
@@ -67,9 +68,9 @@ function Dashboard() {
                             <tr key={file._id}>
                                 <td>{file.name}</td>
                                 <td>{file.size}</td>
-                                <td><span
+                                <td><span className="context-menu"
                                     onClick={() => fileActions(file._id)}>
-                                    <FaEllipsisH style={{ cursor: "pointer" }} /></span>
+                                        <FaEllipsisH style={{ cursor: "pointer" }} /></span>
                                 </td>
                             </tr>
                         ))}
