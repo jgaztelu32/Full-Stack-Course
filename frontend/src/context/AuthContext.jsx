@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { authFetch } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -14,11 +15,8 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/users/whoami", {
+        const res = await authFetch("/users/whoami", {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         });
 
         if (!res.ok) {
@@ -28,7 +26,8 @@ export const AuthProvider = ({ children }) => {
 
         const data = await res.json();
         setUser(data);
-      } catch {
+      } catch (error) {
+        console.error("AuthContext error:", error);
         setUser(null);
       }
     };

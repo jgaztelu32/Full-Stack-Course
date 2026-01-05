@@ -1,98 +1,140 @@
-import { FaEllipsisH } from "react-icons/fa";
+import { FaEllipsisH, FaUpload, FaFolder } from "react-icons/fa";
 import Header from "../components/Header";
 import { useDashboardData } from "../hooks/useDashboardData";
+import ActionMenu from "../components/ActionMenu";
+import { folderActions } from "../components/FolderActions";
+import { fileActions } from "../components/FileActions";
+import { useState } from "react";
 
 function Dashboard() {
-    const {
-        folders,
-        files,
-        current,
-        loading,
-        goToFolder,
-        folderActions,
-        fileActions,
-    } = useDashboardData();
+  const {
+    folders,
+    files,
+    current,
+    loading,
+    goToFolder,
+  } = useDashboardData();
 
-    return (
-        <div>
-            <div style={styles.container}>
-                <Header />
-            </div>
+  const [menu, setMenu] = useState(null);
+  // { x, y, actions }
 
-            <div className="content" style={{ padding: "20px" }}>
-                <p>Current folder: {current?.name || "Root"}</p>
+  const openFolderMenu = (e, folderId) => {
+    e.stopPropagation();
+    setMenu({
+      x: e.clientX,
+      y: e.clientY,
+      actions: folderActions(folderId),
+    });
+  };
 
-                <table className="content-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th className="table-header-size">Size</th>
-                            <th className="table-header-actions">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+  const openFileMenu = (e, fileId) => {
+    e.stopPropagation();
+    setMenu({
+      x: e.clientX,
+      y: e.clientY,
+      actions: fileActions(fileId),
+    });
+  };
 
-                        {current && (
-                            <tr>
-                                <td className="parent-folder">
-                                    <span
-                                        style={styles.link}
-                                        onClick={() => goToFolder(current.parent)}
-                                    >
-                                        ..
-                                    </span>
-                                </td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        )}
+  const closeMenu = () => setMenu(null);
 
-                        {folders?.map(folder => (
-                            <tr key={folder._id}>
-                                <td className="column-name">
-                                    <span
-                                        style={styles.link}
-                                        onClick={() => goToFolder(folder._id)}
-                                    >
-                                        {folder.name}
-                                    </span>
-                                </td>
-                                <td className="column-file-size">-</td>
-                                <td className="column-menu"><span className="context-menu"
-                                    onClick={() => folderActions(folder._id)}>
-                                    <FaEllipsisH style={{ cursor: "pointer" }} /></span></td>
-                            </tr>
-                        ))}
+  return (
+    <div>
+      <div className="header-container">
+        <Header />
+      </div>
 
-                        {files?.map(file => (
-                            <tr key={file._id}>
-                                <td className="column-name">{file.name}</td>
-                                <td className="column-file-size">{file.size}</td>
-                                <td className="column-menu"><span className="context-menu"
-                                    onClick={() => fileActions(file._id)}>
-                                        <FaEllipsisH style={{ cursor: "pointer" }} /></span>
-                                </td>
-                            </tr>
-                        ))}
-
-                    </tbody>
-                </table>
-
-                {loading && <span>Loading...</span>}
+      <div className="content" style={{ padding: "20px" }}>
+        <div className="dashboard-header">
+            <div className="current-folder">Current folder: {current?.name || "Root"}</div>
+            <div className="current-actions">
+                <button><FaFolder /> New folder</button>
+                <button><FaUpload /> Upload file</button>
             </div>
         </div>
-    );
-}
+        <table className="content-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th className="table-header-size">Size</th>
+              <th className="table-header-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
 
-const styles = {
-    container: {
-        width: "100%",
-        background: "#f5f5f5",
-    },
-    link: {
-        cursor: "pointer",
-        color: "blue",
-    },
-};
+            {current && (
+              <tr>
+                <td className="parent-folder">
+                  <span
+                    className="folder-link"
+                    onClick={() => goToFolder(current.parent)}
+                    title="Go up"
+                  >
+                    ..
+                  </span>
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+            )}
+
+            {folders?.map(folder => (
+              <tr key={folder._id}>
+                <td className="column-name">
+                  <span
+                    className="folder-link"
+                    onClick={() => goToFolder(folder._id)}
+                  >
+                    {folder.name}
+                  </span>
+                </td>
+                <td className="column-file-size">-</td>
+                <td className="column-menu">
+                  <span
+                    className="context-menu"
+                    onClick={(e) => openFolderMenu(e, folder._id)}
+                  >
+                    <FaEllipsisH />
+                  </span>
+                </td>
+              </tr>
+            ))}
+
+            {files?.map(file => (
+              <tr key={file._id}>
+                <td className="column-name">{file.name}</td>
+                <td className="column-file-size">{file.size}</td>
+                <td className="column-menu">
+                  <span
+                    className="context-menu"
+                    onClick={(e) => openFileMenu(e, file._id)}
+                  >
+                    <FaEllipsisH />
+                  </span>
+                </td>
+              </tr>
+            ))}
+
+          </tbody>
+        </table>
+
+        {loading && <span>Loading...</span>}
+      </div>
+
+      {menu && (
+        <div
+          style={{
+            position: "fixed",
+            top: menu.y,
+            left: menu.x,
+            zIndex: 2000,
+          }}
+        >
+          <ActionMenu actions={menu.actions} onClose={closeMenu} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default Dashboard;
