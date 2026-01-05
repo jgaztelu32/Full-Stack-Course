@@ -10,12 +10,12 @@ const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "Todos los campos son obligatorios" });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     const exists = await User.findOne({ email });
     if (exists) {
-        throw new Error("El usuario ya existe");
+        throw new Error("User already exists");
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -30,7 +30,7 @@ const registerUser = async (req, res) => {
     const token = generateToken(userId);
 
     res.status(201).json({
-      message: "Usuario creado correctamente",
+      message: "User created successfully",
       userId,
       token,
     });
@@ -48,12 +48,12 @@ const login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-    throw new Error("Credenciales inválidas");
+    throw new Error("Invalid credentials");
     }
 
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) {
-    throw new Error("Credenciales inválidas");
+    throw new Error("Invalid credentials");
     }
     
     const token = generateToken(user._id);
@@ -76,7 +76,7 @@ const login = async (req, res) => {
 const whoami = async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) {
-    return res.status(404).json({ message: "Usuario no encontrado" });
+    return res.status(404).json({ message: "User not found" });
   }
   res.status(200).json({
     id: user._id,
@@ -98,7 +98,7 @@ const changeUserName = async (req, res) => {
     { new: true }
   );
 
-  res.status(200).json({ message: "Nombre actualizado correctamente" });
+  res.status(200).json({ message: "Name updated successfully" });
 };
 
 /* =========================
@@ -115,7 +115,7 @@ const changeUserPassword = async (req, res) => {
     { new: true }
   );
 
-  res.status(200).json({ message: "Contraseña actualizada correctamente" });
+  res.status(200).json({ message: "Password updated successfully" });
 };
 
 /* =========================
@@ -126,7 +126,7 @@ const removeUser = async (req, res) => {
 
   await User.findByIdAndDelete(id);
 
-  res.status(200).json({ message: "Usuario eliminado correctamente" });
+  res.status(200).json({ message: "User deleted successfully" });
 };
 
 /* =========================

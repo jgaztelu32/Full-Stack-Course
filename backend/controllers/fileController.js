@@ -7,11 +7,9 @@ const permission = require("../services/permissionService");
 const createFile = async (req, res) => {
   try {
     const { name, description, parent } = JSON.parse(req.body.metadata);
-
     if (!req.file) {
       return res.status(400).json({ message: "File not uploaded" });
     }
-
     if (!(await permission.canWrite(req.user.id, "folder", parent))) {
         return res.status(403).json({
             message: "You don't have permission to create files here",

@@ -9,7 +9,7 @@ const createFolder = async (req, res) => {
     const { name, description, parent, userId } = req.body;
 
     if (!userId) {
-      return res.status(400).json({ message: "userId es obligatorio" });
+      return res.status(400).json({ message: "userId is required" });
     }
 
     if (!(await permission.canWrite(userId, "folder", parent))) {

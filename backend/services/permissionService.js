@@ -61,6 +61,14 @@ const resolvePermission = async (
   // Explicit allow / deny
   if (explicit !== null) return explicit;
 
+  // Try folder owner
+  if( resourceType === "folder" ) {
+    const folder = await Folder.findById(resourceId).select("userId");
+    if (folder && folder.userId == userId) {
+      return true;
+    }
+  }
+
   // Try parent
   const parent = await getParentResource(resourceType, resourceId);
   if (!parent) return false;

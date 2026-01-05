@@ -5,38 +5,39 @@ import ActionMenu from "../components/ActionMenu";
 import { folderActions } from "../components/FolderActions";
 import { fileActions } from "../components/FileActions";
 import { useState } from "react";
+import UploadModal from "../components/UploadModal";
 
 function Dashboard() {
-  const {
-    folders,
-    files,
-    current,
-    loading,
-    goToFolder,
-  } = useDashboardData();
+    const [showUpload, setShowUpload] = useState(false);
+    const {
+        folders,
+        files,
+        current,
+        loading,
+        goToFolder,
+    } = useDashboardData();
 
-  const [menu, setMenu] = useState(null);
-  // { x, y, actions }
+    const [menu, setMenu] = useState(null); // { x, y, actions }
 
-  const openFolderMenu = (e, folderId) => {
+    const openFolderMenu = (e, folderId) => {
+        e.stopPropagation();
+        setMenu({
+            x: e.clientX,
+            y: e.clientY,
+            actions: folderActions(folderId),
+        });
+    };
+
+    const openFileMenu = (e, fileId) => {
     e.stopPropagation();
-    setMenu({
-      x: e.clientX,
-      y: e.clientY,
-      actions: folderActions(folderId),
-    });
-  };
+        setMenu({
+            x: e.clientX,
+            y: e.clientY,
+            actions: fileActions(fileId),
+        });
+    };
 
-  const openFileMenu = (e, fileId) => {
-    e.stopPropagation();
-    setMenu({
-      x: e.clientX,
-      y: e.clientY,
-      actions: fileActions(fileId),
-    });
-  };
-
-  const closeMenu = () => setMenu(null);
+    const closeMenu = () => setMenu(null);
 
   return (
     <div>
@@ -49,9 +50,16 @@ function Dashboard() {
             <div className="current-folder">Current folder: {current?.name || "Root"}</div>
             <div className="current-actions">
                 <button><FaFolder /> New folder</button>
-                <button><FaUpload /> Upload file</button>
+                <button onClick={() => setShowUpload(true)}><FaUpload /> Upload file</button>
             </div>
         </div>
+        {showUpload && (
+            <UploadModal
+            currentFolder={current?.id}
+            onClose={() => setShowUpload(false)}
+            onSuccess={() => window.location.reload()}
+            />
+        )}
         <table className="content-table">
           <thead>
             <tr>
