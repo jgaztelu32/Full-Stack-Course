@@ -26,15 +26,15 @@ function Dashboard() {
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Size</th>
-                            <th>Actions</th>
+                            <th className="table-header-size">Size</th>
+                            <th className="table-header-actions">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
 
                         {current && (
                             <tr>
-                                <td>
+                                <td className="parent-folder">
                                     <span
                                         style={styles.link}
                                         onClick={() => goToFolder(current.parent)}
@@ -49,7 +49,7 @@ function Dashboard() {
 
                         {folders?.map(folder => (
                             <tr key={folder._id}>
-                                <td>
+                                <td className="column-name">
                                     <span
                                         style={styles.link}
                                         onClick={() => goToFolder(folder._id)}
@@ -57,8 +57,8 @@ function Dashboard() {
                                         {folder.name}
                                     </span>
                                 </td>
-                                <td>-</td>
-                                <td><span className="context-menu"
+                                <td className="column-file-size">-</td>
+                                <td className="column-menu"><span className="context-menu"
                                     onClick={() => folderActions(folder._id)}>
                                     <FaEllipsisH style={{ cursor: "pointer" }} /></span></td>
                             </tr>
@@ -66,9 +66,9 @@ function Dashboard() {
 
                         {files?.map(file => (
                             <tr key={file._id}>
-                                <td>{file.name}</td>
-                                <td>{file.size}</td>
-                                <td><span className="context-menu"
+                                <td className="column-name">{file.name}</td>
+                                <td className="column-file-size">{file.size}</td>
+                                <td className="column-menu"><span className="context-menu"
                                     onClick={() => fileActions(file._id)}>
                                         <FaEllipsisH style={{ cursor: "pointer" }} /></span>
                                 </td>

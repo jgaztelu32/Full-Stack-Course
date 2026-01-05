@@ -17,9 +17,16 @@ code {
   border-collapse: collapse;
 }
 
-.content-table th, .content-table td {
+.content-table th {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 4px;
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.content-table td {
+  border-bottom: 1px solid #ddd;
+  padding: 2px;
 }
 
 .context-menu {
@@ -28,4 +35,27 @@ code {
 
 .context-menu:hover {
   color: #007BFF;
+  background-color: #ddd;
+  border-radius: 4px;
+}
+
+.column-name {
+  text-align: left;
+}
+
+.column-file-size {
+  text-align: right;
+  padding-right: 10px;
+}
+.column-menu {
+  text-align: center;
+}
+
+th.table-header-actions {
+  text-align: center;
+}
+
+th.table-header-size {
+  text-align: right;
+  padding-right: 10px;
 }
