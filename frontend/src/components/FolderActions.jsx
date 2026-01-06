@@ -8,8 +8,9 @@ import { authFetch } from "../services/api";
 /**
  * Context menu actions for a folder
  * @param {string} folderId
+ * @param {function} openMoveModal
  */
-export const folderActions = (folderId) => [
+export const folderActions = (folderId, openMoveModal) => [
     {
         icon: <FaEdit />,
         label: "Rename folder",
@@ -20,9 +21,7 @@ export const folderActions = (folderId) => [
     {
         icon: <FaArrowsAlt />,
         label: "Move folder",
-        onClick: () => {
-            alert("Move folder (not implemented yet)");
-        },
+        onClick: () => openMoveModal(folderId),
     },
     {
         icon: <FaTrashAlt />,
@@ -53,3 +52,4 @@ export const folderActions = (folderId) => [
         },
     },
 ];
+

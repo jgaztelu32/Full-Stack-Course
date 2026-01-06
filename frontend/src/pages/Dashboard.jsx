@@ -1,20 +1,18 @@
 import { FaEllipsisH, FaUpload, FaFolder } from "react-icons/fa";
-import Header from "../components/Header";
-import { useDashboardData } from "../hooks/useDashboardData";
-import ActionMenu from "../components/ActionMenu";
-import { folderActions } from "../components/FolderActions";
-import { fileActions } from "../components/FileActions";
 import { useState } from "react";
+
+import Header from "../components/Header";
+import ActionMenu from "../components/ActionMenu";
 import UploadModal from "../components/UploadModal";
 import CreateFolderModal from "../components/CreateFolderModal";
+import MoveFolderModal from "../components/MoveFolderModal";
+
+import { useDashboardData } from "../hooks/useDashboardData";
+import { folderActions } from "../components/FolderActions";
+import { fileActions } from "../components/FileActions";
 import { createFolder } from "../services/folderService";
 
-
 function Dashboard() {
-    const [showCreateFolder, setShowCreateFolder] = useState(false);
-    
-    const [showUpload, setShowUpload] = useState(false);
-
     const {
         folders,
         files,
@@ -23,19 +21,24 @@ function Dashboard() {
         goToFolder,
     } = useDashboardData();
 
-    const [menu, setMenu] = useState(null); // { x, y, actions }
+    const [menu, setMenu] = useState(null);
+    const [showUpload, setShowUpload] = useState(false);
+    const [showCreateFolder, setShowCreateFolder] = useState(false);
+    const [moveFolder, setMoveFolder] = useState(null);
 
-    const openFolderMenu = (e, folderId) => {
+    const closeMenu = () => setMenu(null);
+
+    const openFolderMenu = (e, folder) => {
         e.stopPropagation();
         setMenu({
             x: e.clientX,
             y: e.clientY,
-            actions: folderActions(folderId),
+            actions: folderActions(folder._id, setMoveFolder),
         });
     };
 
     const openFileMenu = (e, fileId) => {
-    e.stopPropagation();
+        e.stopPropagation();
         setMenu({
             x: e.clientX,
             y: e.clientY,
@@ -43,132 +46,148 @@ function Dashboard() {
         });
     };
 
-    const closeMenu = () => setMenu(null);
-
     const handleCreateFolder = async (data) => {
         try {
             await createFolder(data);
             setShowCreateFolder(false);
             window.location.reload();
-        } catch (err) {
+        } catch {
             alert("Error creating folder");
         }
     };
 
+    const movingFolder = folders?.find(f => f._id === moveFolder);
 
-  return (
-    <div>
-      <div className="header-container">
-        <Header />
-      </div>
-
-      <div className="content" style={{ padding: "20px" }}>
-        <div className="dashboard-header">
-            <div className="current-folder">Current folder: {current?.name || "Root"}</div>
-            <div className="current-actions">
-                <button onClick={() => setShowCreateFolder(true)}><FaFolder /> New folder</button>
-                {current && (
-                    <button onClick={() => setShowUpload(true)}><FaUpload /> Upload file</button>
-                )}
+    return (
+        <div>
+            <div className="header-container">
+                <Header />
             </div>
-        </div>
-        {showUpload && (
-            <UploadModal
-            currentFolder={current?.id}
-            onClose={() => setShowUpload(false)}
-            onSuccess={() => window.location.reload()}
-            />
-        )}
-        <table className="content-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th className="table-header-size">Size</th>
-              <th className="table-header-actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
 
-            {current && (
-              <tr>
-                <td className="parent-folder">
-                  <span
-                    className="folder-link"
-                    onClick={() => goToFolder(current.parent)}
-                    title="Go up"
-                  >
-                    ..
-                  </span>
-                </td>
-                <td></td>
-                <td></td>
-              </tr>
+            <div className="content" style={{ padding: "20px" }}>
+                <div className="dashboard-header">
+                    <div className="current-folder">
+                        Current folder: {current?.name || "Root"}
+                    </div>
+
+                    <div className="current-actions">
+                        <button onClick={() => setShowCreateFolder(true)}>
+                            <FaFolder /> New folder
+                        </button>
+
+                        {current && (
+                            <button onClick={() => setShowUpload(true)}>
+                                <FaUpload /> Upload file
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {showUpload && (
+                    <UploadModal
+                        currentFolder={current?.id}
+                        onClose={() => setShowUpload(false)}
+                        onSuccess={() => window.location.reload()}
+                    />
+                )}
+
+                <table className="content-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th className="table-header-size">Size</th>
+                            <th className="table-header-actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {current && (
+                            <tr>
+                                <td className="parent-folder">
+                                    <span
+                                        className="folder-link"
+                                        onClick={() => goToFolder(current.parent)}
+                                        title="Go up"
+                                    >
+                                        ..
+                                    </span>
+                                </td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        )}
+
+                        {folders?.map(folder => (
+                            <tr key={folder._id}>
+                                <td className="column-name">
+                                    <span
+                                        className="folder-link"
+                                        onClick={() => goToFolder(folder._id)}
+                                    >
+                                        {folder.name}
+                                    </span>
+                                </td>
+                                <td className="column-file-size">Folder</td>
+                                <td className="column-menu">
+                                    <span
+                                        className="context-menu"
+                                        onClick={(e) => openFolderMenu(e, folder)}
+                                    >
+                                        <FaEllipsisH />
+                                    </span>
+                                </td>
+                            </tr>
+                        ))}
+
+                        {files?.map(file => (
+                            <tr key={file._id}>
+                                <td className="column-name">{file.name}</td>
+                                <td className="column-file-size">{file.size}</td>
+                                <td className="column-menu">
+                                    <span
+                                        className="context-menu"
+                                        onClick={(e) => openFileMenu(e, file._id)}
+                                    >
+                                        <FaEllipsisH />
+                                    </span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                {loading && <span>Loading...</span>}
+            </div>
+
+            {menu && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: menu.y,
+                        left: menu.x,
+                        zIndex: 2000,
+                    }}
+                >
+                    <ActionMenu actions={menu.actions} onClose={closeMenu} />
+                </div>
             )}
 
-            {folders?.map(folder => (
-              <tr key={folder._id}>
-                <td className="column-name">
-                  <span
-                    className="folder-link"
-                    onClick={() => goToFolder(folder._id)}
-                  >
-                    {folder.name}
-                  </span>
-                </td>
-                <td className="column-file-size">-</td>
-                <td className="column-menu">
-                  <span
-                    className="context-menu"
-                    onClick={(e) => openFolderMenu(e, folder._id)}
-                  >
-                    <FaEllipsisH />
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {showCreateFolder && (
+                <CreateFolderModal
+                    parentId={current?.id || "root"}
+                    onCreate={handleCreateFolder}
+                    onCancel={() => setShowCreateFolder(false)}
+                />
+            )}
 
-            {files?.map(file => (
-              <tr key={file._id}>
-                <td className="column-name">{file.name}</td>
-                <td className="column-file-size">{file.size}</td>
-                <td className="column-menu">
-                  <span
-                    className="context-menu"
-                    onClick={(e) => openFileMenu(e, file._id)}
-                  >
-                    <FaEllipsisH />
-                  </span>
-                </td>
-              </tr>
-            ))}
-
-          </tbody>
-        </table>
-
-        {loading && <span>Loading...</span>}
-      </div>
-
-      {menu && (
-        <div
-          style={{
-            position: "fixed",
-            top: menu.y,
-            left: menu.x,
-            zIndex: 2000,
-          }}
-        >
-          <ActionMenu actions={menu.actions} onClose={closeMenu} />
+            {moveFolder && movingFolder && (
+                <MoveFolderModal
+                    folderId={moveFolder}
+                    folderName={movingFolder.name}
+                    onClose={() => setMoveFolder(null)}
+                />
+            )}
         </div>
-      )}
-      {showCreateFolder && (
-            <CreateFolderModal
-                parentId={current?.id || "root"}
-                onCreate={handleCreateFolder}
-                onCancel={() => setShowCreateFolder(false)}
-            />
-      )}
-    </div>
-  );
+    );
 }
 
 export default Dashboard;

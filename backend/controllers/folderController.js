@@ -10,16 +10,23 @@ const createFolder = async (req, res) => {
 
     const userId = req.user.id;
 
-    if (!(await permission.canWrite(userId, "folder", parent))) {
-        return res.status(403).json({
-            message: "You don't have permission to create folders here",
-        });
+    var parentFolder;
+    if (parent === "root") {
+      parentFolder = null;
+
+      if (!(await permission.canWrite(userId, "folder", parentFolder))) {
+          return res.status(403).json({
+              message: "You don't have permission to create folders here",
+          });
+      }
+    } else {
+        parentFolder = parent;
     }
 
     const folder = await Folder.create({
       name,
       description,
-      parent: parent || null,
+      parent: parentFolder,
       userId,
     });
 
@@ -92,6 +99,43 @@ const getCurrentFolderData = async (req, res) => {
 };
 
 /* =========================
+   Update folder data
+========================= */
+const updateFolder = async (req, res) => {
+    try {
+        const { folderId } = req.params;
+        const { name, description, parent } = req.body;
+        const userId = req.user.id;
+
+        const folder = await Folder.findById(folderId);
+        if (!folder) {
+            return res.status(404).json({
+                message: "Folder not found",
+            });
+        }
+
+        if (!(await permission.canWrite(userId, "folder", folderId))) {
+            return res.status(403).json({
+                message: "You don't have permission to update this folder",
+            });
+        }
+
+        const updatedFolder = await Folder.findByIdAndUpdate(
+            folderId,
+            { name, description, parent },
+            { new: true }
+        );
+
+        res.status(200).json(updatedFolder);
+    } catch (error) {
+        res.status(500).json({
+            message: "Error updating folder. Internal error.",
+            error: error.message,
+        });
+    }
+};
+
+/* =========================
    Delete folder (recursive)
 ========================= */
 const deleteFolderRecursive = async (folderId) => {
@@ -138,5 +182,6 @@ module.exports = {
   createFolder,
   getFoldersByParent,
   getCurrentFolderData,
+  updateFolder,
   deleteFolder,
 };
