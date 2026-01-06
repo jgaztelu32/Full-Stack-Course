@@ -6,7 +6,7 @@ export default function FolderTree({
     level = 0,
 }) {
     return (
-        <ul style={{ marginLeft: level * 16 }}>
+        <ul className={level === 0 ? "folder-tree" : ""}>
             {tree.map(folder => {
                 const isDisabled = folder._id === disabledId;
 

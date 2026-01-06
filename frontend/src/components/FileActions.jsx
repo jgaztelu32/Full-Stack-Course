@@ -9,8 +9,10 @@ import { authFetch } from "../services/api";
 /**
  * Context menu actions for a file
  * @param {string} fileId
+ * @param {object} file
+ * @param {function} setMoveFile
  */
-export const fileActions = (fileId) => [
+export const fileActions = (fileId, file, setMoveFile) => [
     {
         icon: <FaDownload />,
         label: "Download file",
@@ -58,14 +60,23 @@ export const fileActions = (fileId) => [
         icon: <FaEdit />,
         label: "Rename file",
         onClick: () => {
-            alert("Rename file (not implemented yet)");
+            console.log("file", file);
+            window.dispatchEvent(
+                new CustomEvent("open-file-rename", {
+                    detail: {
+                        fileId,
+                        name: file.name,
+                        description: file.description,
+                    },
+                })
+            );
         },
     },
     {
         icon: <FaArrowsAlt />,
         label: "Move file",
         onClick: () => {
-            alert("Move file (not implemented yet)");
+            setMoveFile(file);
         },
     },
     {

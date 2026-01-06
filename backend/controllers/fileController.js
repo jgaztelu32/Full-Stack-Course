@@ -77,46 +77,46 @@ const updateFile = async (req, res) => {
     try {
         const updates = {};
 
-        // Metadata optional
+        if (req.body.name) updates.name = req.body.name;
+        if (req.body.description) updates.description = req.body.description;
+        if (req.body.parent) updates.parent = req.body.parent;
+
         if (req.body.metadata) {
-        const metadata = JSON.parse(req.body.metadata);
-
-        if (metadata.name) updates.name = metadata.name;
-        if (metadata.description) updates.description = metadata.description;
-        if (metadata.parent) updates.parent = metadata.parent;
+            const metadata = JSON.parse(req.body.metadata);
+            if (metadata.name) updates.name = metadata.name;
+            if (metadata.description) updates.description = metadata.description;
+            if (metadata.parent) updates.parent = metadata.parent;
         }
 
-        // File is optional
         if (req.file) {
-        updates.data = req.file.buffer;
-        updates.size = req.file.size;
+            updates.data = req.file.buffer;
+            updates.size = req.file.size;
         }
 
-        const old_file = await File.findById(req.params.id);
-
-        if (!old_file) {
-        return res.status(404).json({ message: "File not found" });
+        const oldFile = await File.findById(req.params.id);
+        if (!oldFile) {
+            return res.status(404).json({ message: "File not found" });
         }
 
-        if (!(await permission.canWrite(req.user.id, "file", old_file._id))) {
+        if (!(await permission.canWrite(req.user.id, "file", oldFile._id))) {
             return res.status(403).json({
                 message: "You don't have permission to modify this file.",
             });
         }
 
         const file = await File.findByIdAndUpdate(
-        req.params.id,
-        updates,
-        { new: true, runValidators: true }
+            req.params.id,
+            updates,
+            { new: true, runValidators: true }
         );
 
         res.json({
-        id: file._id,
-        name: file.name,
-        size: file.size,
+            id: file._id,
+            name: file.name,
+            description: file.description,
+            size: file.size,
         });
     } catch (error) {
-        // Duplicate key error (same name in same folder)
         if (error.code === 11000) {
             return res.status(400).json({
                 message: "File with that name already exists in the target folder",

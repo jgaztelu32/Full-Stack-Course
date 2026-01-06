@@ -6,11 +6,12 @@ import ActionMenu from "../components/ActionMenu";
 import UploadModal from "../components/UploadModal";
 import CreateFolderModal from "../components/CreateFolderModal";
 import MoveFolderModal from "../components/MoveFolderModal";
-
+import FileRenameModal from "../components/modal-file-rename";
 import { useDashboardData } from "../hooks/useDashboardData";
 import { folderActions } from "../components/FolderActions";
 import { fileActions } from "../components/FileActions";
 import { createFolder } from "../services/folderService";
+import MoveFileModal from "../components/MoveFileModal";
 
 function Dashboard() {
     const {
@@ -25,6 +26,7 @@ function Dashboard() {
     const [showUpload, setShowUpload] = useState(false);
     const [showCreateFolder, setShowCreateFolder] = useState(false);
     const [moveFolder, setMoveFolder] = useState(null);
+    const [moveFile, setMoveFile] = useState(null);
 
     const closeMenu = () => setMenu(null);
 
@@ -42,7 +44,7 @@ function Dashboard() {
         setMenu({
             x: e.clientX,
             y: e.clientY,
-            actions: fileActions(fileId),
+            actions: fileActions(fileId, files.find(f => f._id === fileId), setMoveFile),
         });
     };
 
@@ -145,7 +147,7 @@ function Dashboard() {
                                 <td className="column-menu">
                                     <span
                                         className="context-menu"
-                                        onClick={(e) => openFileMenu(e, file._id)}
+                                        onClick={(e) => openFileMenu(e, file._id, file)}
                                     >
                                         <FaEllipsisH />
                                     </span>
@@ -186,6 +188,15 @@ function Dashboard() {
                     onClose={() => setMoveFolder(null)}
                 />
             )}
+            {moveFile && (
+                <MoveFileModal
+                    file={moveFile}
+                    onClose={() => setMoveFile(null)}
+                    onSuccess={() => window.location.reload()}
+                />
+            )}
+
+            <FileRenameModal />
         </div>
     );
 }

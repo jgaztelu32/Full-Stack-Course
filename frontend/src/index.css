@@ -209,3 +209,71 @@ header.header-logo {
     background-color: #007bff;
     color: white;
 }
+
+/* =========================
+   Folder tree styles
+========================= */
+
+.folder-tree,
+.folder-tree ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+/* Child list indentation */
+.folder-tree ul {
+    margin-left: 20px;
+    padding-left: 12px;
+    border-left: 1px solid #ccc;
+}
+
+/* Each node */
+.folder-tree li {
+    position: relative;
+    padding: 6px 0 6px 16px;
+}
+
+/* Horizontal connector */
+.folder-tree li::before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    left: 0;
+    width: 12px;
+    height: 1px;
+    background: #ccc;
+}
+
+/* Folder label */
+.folder-tree span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Hover effect */
+.folder-tree span:hover {
+    background: #f2f6ff;
+    border-radius: 4px;
+}
+
+/* Disabled folder */
+.folder-tree span[style*="not-allowed"] {
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Selected folder */
+.folder-selected {
+    color: #1a73e8;
+    font-weight: 600;
+}
+
+/* Remove connector from root nodes */
+.folder-tree > li::before {
+    display: none;
+}
