@@ -1,0 +1,67 @@
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modal-folders {
+    background: #fff;
+    padding: 20px;
+    width: 360px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-upper-block {
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.modal-upper-block input{
+    width: 100%;
+}
+
+.modal-lower-block {
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.modal-lower-block textarea {
+    width: 100%;
+    min-height: 50px;
+}
+
+.modal textarea {
+    resize: none;
+    height: 80px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-create {
+    background: #1976d2;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+}
+
+.btn-cancel {
+    background: #ccc;
+    border: none;
+    padding: 6px 12px;
+}
+
+.modal-error {
+    color: red;
+    font-size: 0.85rem;
+}

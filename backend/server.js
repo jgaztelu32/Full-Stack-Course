@@ -12,8 +12,12 @@ const cors = require("cors");
 const app = express();
 
 connectDB();
-
-app.use(cors());
+/* =========================
+   CORS
+========================= */
+app.use(cors({
+  exposedHeaders: ["Content-Disposition"],
+}));
 
 /* =========================
    Middlewares

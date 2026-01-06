@@ -6,11 +6,9 @@ const permission = require("../services/permissionService");
 ========================= */
 const createFolder = async (req, res) => {
   try {
-    const { name, description, parent, userId } = req.body;
+    const { name, description, parent } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ message: "userId is required" });
-    }
+    const userId = req.user.id;
 
     if (!(await permission.canWrite(userId, "folder", parent))) {
         return res.status(403).json({

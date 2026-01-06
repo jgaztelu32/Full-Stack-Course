@@ -6,9 +6,15 @@ import { folderActions } from "../components/FolderActions";
 import { fileActions } from "../components/FileActions";
 import { useState } from "react";
 import UploadModal from "../components/UploadModal";
+import CreateFolderModal from "../components/CreateFolderModal";
+import { createFolder } from "../services/folderService";
+
 
 function Dashboard() {
+    const [showCreateFolder, setShowCreateFolder] = useState(false);
+    
     const [showUpload, setShowUpload] = useState(false);
+
     const {
         folders,
         files,
@@ -39,6 +45,17 @@ function Dashboard() {
 
     const closeMenu = () => setMenu(null);
 
+    const handleCreateFolder = async (data) => {
+        try {
+            await createFolder(data);
+            setShowCreateFolder(false);
+            window.location.reload();
+        } catch (err) {
+            alert("Error creating folder");
+        }
+    };
+
+
   return (
     <div>
       <div className="header-container">
@@ -49,7 +66,7 @@ function Dashboard() {
         <div className="dashboard-header">
             <div className="current-folder">Current folder: {current?.name || "Root"}</div>
             <div className="current-actions">
-                <button><FaFolder /> New folder</button>
+                <button onClick={() => setShowCreateFolder(true)}><FaFolder /> New folder</button>
                 {current && (
                     <button onClick={() => setShowUpload(true)}><FaUpload /> Upload file</button>
                 )}
@@ -142,6 +159,13 @@ function Dashboard() {
         >
           <ActionMenu actions={menu.actions} onClose={closeMenu} />
         </div>
+      )}
+      {showCreateFolder && (
+            <CreateFolderModal
+                parentId={current?.id || "root"}
+                onCreate={handleCreateFolder}
+                onCancel={() => setShowCreateFolder(false)}
+            />
       )}
     </div>
   );

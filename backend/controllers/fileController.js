@@ -57,6 +57,7 @@ const getFile = async (req, res) => {
         });
     }
 
+    res.set("Content-Length", file.data.length);
     res.set("Content-Type", "application/octet-stream");
     res.set(
       "Content-Disposition",

@@ -33,7 +33,8 @@ function ActionMenu({ actions, onClose }) {
             onClose();
           }}
         >
-          {action.label}
+            {action.icon && <span className="action-icon">{action.icon}&nbsp;</span>}
+            {action.label}
         </div>
       ))}
     </div>
