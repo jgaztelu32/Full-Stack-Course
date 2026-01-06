@@ -27,7 +27,6 @@ export default function FolderTree({
                             📁 {folder.name}
                         </span>
 
-                        {/* 👇 CLAVE: no renderizar hijos si es la carpeta deshabilitada */}
                         {!isDisabled && folder.children?.length > 0 && (
                             <FolderTree
                                 tree={folder.children}
