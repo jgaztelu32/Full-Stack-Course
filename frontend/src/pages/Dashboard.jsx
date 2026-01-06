@@ -12,6 +12,7 @@ import { folderActions } from "../components/FolderActions";
 import { fileActions } from "../components/FileActions";
 import { createFolder } from "../services/folderService";
 import MoveFileModal from "../components/MoveFileModal";
+import RenameFolderModal from "../components/RenameFolderModal";
 
 function Dashboard() {
     const {
@@ -27,6 +28,7 @@ function Dashboard() {
     const [showCreateFolder, setShowCreateFolder] = useState(false);
     const [moveFolder, setMoveFolder] = useState(null);
     const [moveFile, setMoveFile] = useState(null);
+    const [renameFolder, setRenameFolder] = useState(null);
 
     const closeMenu = () => setMenu(null);
 
@@ -35,7 +37,7 @@ function Dashboard() {
         setMenu({
             x: e.clientX,
             y: e.clientY,
-            actions: folderActions(folder._id, setMoveFolder),
+            actions: folderActions(folder._id, setMoveFolder, setRenameFolder, folder),
         });
     };
 
@@ -195,6 +197,19 @@ function Dashboard() {
                     onSuccess={() => window.location.reload()}
                 />
             )}
+            {renameFolder && (
+                <RenameFolderModal
+                    folderId={renameFolder.id}
+                    currentName={renameFolder.name}
+                    currentDescription={renameFolder.description}
+                    onClose={() => setRenameFolder(null)}
+                    onSuccess={() => {
+                        setRenameFolder(null);
+                        window.location.reload()}
+                    }
+                />
+            )}
+
 
             <FileRenameModal />
         </div>

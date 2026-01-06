@@ -60,21 +60,24 @@ export default function FileRenameModal() {
             <div className="modal-file-rename">
                 <h2>Rename file</h2>
 
-                <label>
+                <span>
                     Name
+                </span>
+                <div>
                     <input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
-                </label>
-
-                <label>
+                </div>
+                <span>
                     Description
+                </span>
+                <div>
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     />
-                </label>
+                </div>
 
                 <div className="actions">
                     <button onClick={close} disabled={loading}>

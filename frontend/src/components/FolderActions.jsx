@@ -9,13 +9,19 @@ import { authFetch } from "../services/api";
  * Context menu actions for a folder
  * @param {string} folderId
  * @param {function} openMoveModal
+ * @param {function} openRenameModal
+ * @param {object} folder
  */
-export const folderActions = (folderId, openMoveModal) => [
+export const folderActions = (folderId, openMoveModal, openRenameModal, folder) => [
     {
         icon: <FaEdit />,
         label: "Rename folder",
         onClick: () => {
-            alert("Rename folder (not implemented yet)");
+            openRenameModal({
+                id: folderId,
+                name: folder.name,
+                description: folder.description
+            });
         },
     },
     {

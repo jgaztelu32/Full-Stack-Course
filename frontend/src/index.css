@@ -277,3 +277,43 @@ header.header-logo {
 .folder-tree > li::before {
     display: none;
 }
+
+.modal-file-rename {
+  display: block;
+  background: #f2f6ff;
+  padding: 12px;
+  min-width: 300px;
+  border-radius: 6px;
+  box-shadow: 10px 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-file-rename textarea{
+  width: 100%;
+  min-height: 50px;
+}
+
+.modal-file-rename input{
+  width: 100%;
+}
+
+.modal-file-rename button{
+  float: right;
+  text-align: right;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+}
