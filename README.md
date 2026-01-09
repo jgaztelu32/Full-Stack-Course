@@ -41,7 +41,7 @@ cd ..\frontend
 npm install
 
 ### ▶️ Start the frontend
-npm run client
+npm start client
 
 This should open up the application in your default web browser at http://localhost:3000
 If it does not open automatically, you can manually navigate to that URL
