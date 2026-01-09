@@ -29,7 +29,7 @@ cd backend
 npm install
 
 ### ▶️ Start the backend server
-npm run server
+npm start server
 
 
 ## 🖥️ Frontend Setup (Also required)
